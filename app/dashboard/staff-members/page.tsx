@@ -6,19 +6,37 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger 
+} from '@/components/ui/sheet'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import DashboardSidebar from '@/components/dashboard/sidebar'
+
+interface StaffMember {
+  id: number;
+  name: string;
+  role: string;
+  image: string;
+  rating: number;
+}
+
 export default function StaffMembers() {
-  const [memberModalOpen, setMemberModalOpen] = useState(false)
-  const [editMemberModalOpen, setEditMemberModalOpen] = useState(false)
-  const [updateHoursModalOpen, setUpdateHoursModalOpen] = useState(false)
-  const [assignServicesModalOpen, setAssignServicesModalOpen] = useState(false)
-  const [selectedMember, setSelectedMember] = useState<any>(null)
+  const [addMemberOpen, setAddMemberOpen] = useState(false)
+  const [editMemberOpen, setEditMemberOpen] = useState(false)
+  const [updateHoursOpen, setUpdateHoursOpen] = useState(false)
+  const [assignServicesOpen, setAssignServicesOpen] = useState(false)
+  const [selectedMember, setSelectedMember] = useState<StaffMember | null>(null)
+  const [selectedTab, setSelectedTab] = useState("all")
+  const [activeSheet, setActiveSheet] = useState("")
   
-  const staffMembers = [
+  const staffMembers: StaffMember[] = [
     {
       id: 1,
       name: 'Jessica Waltz',
@@ -56,27 +74,32 @@ export default function StaffMembers() {
     }
   ]
   
-  const handleStaffClick = (member:any) => {
+  const handleStaffClick = (member: StaffMember) => {
     setSelectedMember(member)
+    setActiveSheet("details")
   }
   
   const handleAddMember = () => {
-    setMemberModalOpen(true)
+    setAddMemberOpen(true)
   }
   
-  const handleEditMember = (member:any) => {
+  const handleEditMember = (member: StaffMember) => {
     setSelectedMember(member)
-    setEditMemberModalOpen(true)
+    setEditMemberOpen(true)
   }
   
-  const handleUpdateHours = (member:any) => {
+  const handleUpdateHours = (member: StaffMember) => {
     setSelectedMember(member)
-    setUpdateHoursModalOpen(true)
+    setUpdateHoursOpen(true)
   }
   
-  const handleAssignServices = (member:any) => {
+  const handleAssignServices = (member: StaffMember) => {
     setSelectedMember(member)
-    setAssignServicesModalOpen(true)
+    setAssignServicesOpen(true)
+  }
+
+  const handleTabChange = (value: string) => {
+    setSelectedTab(value)
   }
 
   return (
@@ -105,300 +128,473 @@ export default function StaffMembers() {
         </div>
         
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-white text-sm font-medium">{staffMembers.length} Members</h2>
-          <Button onClick={handleAddMember} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="16"></line>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
-            Member
-          </Button>
+          <Tabs defaultValue="all" value={selectedTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="bg-[#252836] mb-6">
+              <TabsTrigger value="all" className="data-[state=active]:bg-blue-600">All Staff</TabsTrigger>
+              <TabsTrigger value="stylists" className="data-[state=active]:bg-blue-600">Stylists</TabsTrigger>
+              <TabsTrigger value="colorists" className="data-[state=active]:bg-blue-600">Colorists</TabsTrigger>
+              <TabsTrigger value="cutters" className="data-[state=active]:bg-blue-600">Hair Cutters</TabsTrigger>
+            </TabsList>
+            
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-white text-sm font-medium">{staffMembers.length} Members</h2>
+              <Button onClick={handleAddMember} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="16"></line>
+                  <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                Member
+              </Button>
+            </div>
+            
+            <TabsContent value="all" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers.map((member) => (
+                  <div 
+                    key={member.id} 
+                    className="bg-[#252836] rounded-lg p-4 relative cursor-pointer hover:bg-[#2a2e3d] transition-colors"
+                    onClick={() => handleStaffClick(member)}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="h-16 w-16 rounded-lg overflow-hidden">
+                        <img src={member.image} alt={member.name} className="h-full w-full object-cover" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-white font-medium">{member.name}</h3>
+                        <p className="text-gray-400 text-sm">{member.role}</p>
+                        <div className="flex items-center mt-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <svg 
+                              key={star} 
+                              className={`w-4 h-4 ${star <= Math.floor(member.rating) ? "text-yellow-400" : "text-gray-600"}`} 
+                              fill="currentColor" 
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                          <span className="ml-1 text-gray-400 text-xs">{member.rating}</span>
+                        </div>
+                      </div>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            className="text-gray-400 hover:text-white" 
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="1"></circle>
+                              <circle cx="12" cy="5" r="1"></circle>
+                              <circle cx="12" cy="19" r="1"></circle>
+                            </svg>
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="bg-[#252836] border-gray-700 w-48 p-0">
+                          <div className="py-1">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditMember(member);
+                              }} 
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                            >
+                              Edit Info
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateHours(member);
+                              }} 
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                            >
+                              Edit Working Hours
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAssignServices(member);
+                              }} 
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                            >
+                              Assign Services
+                            </button>
+                            <button 
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="stylists" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers
+                  .filter(member => member.role.includes('Stylist'))
+                  .map((member) => (
+                    <div 
+                      key={member.id} 
+                      className="bg-[#252836] rounded-lg p-4 relative cursor-pointer hover:bg-[#2a2e3d] transition-colors"
+                      onClick={() => handleStaffClick(member)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="h-16 w-16 rounded-lg overflow-hidden">
+                          <img src={member.image} alt={member.name} className="h-full w-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-white font-medium">{member.name}</h3>
+                          <p className="text-gray-400 text-sm">{member.role}</p>
+                          <div className="flex items-center mt-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg 
+                                key={star} 
+                                className={`w-4 h-4 ${star <= Math.floor(member.rating) ? "text-yellow-400" : "text-gray-600"}`} 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                            <span className="ml-1 text-gray-400 text-xs">{member.rating}</span>
+                          </div>
+                        </div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              className="text-gray-400 hover:text-white" 
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="12" cy="5" r="1"></circle>
+                                <circle cx="12" cy="19" r="1"></circle>
+                              </svg>
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="bg-[#252836] border-gray-700 w-48 p-0">
+                            <div className="py-1">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditMember(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Edit Info
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateHours(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Edit Working Hours
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAssignServices(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Assign Services
+                              </button>
+                              <button 
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="colorists" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers
+                  .filter(member => member.role.includes('Colorist'))
+                  .map((member) => (
+                    <div 
+                      key={member.id} 
+                      className="bg-[#252836] rounded-lg p-4 relative cursor-pointer hover:bg-[#2a2e3d] transition-colors"
+                      onClick={() => handleStaffClick(member)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="h-16 w-16 rounded-lg overflow-hidden">
+                          <img src={member.image} alt={member.name} className="h-full w-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-white font-medium">{member.name}</h3>
+                          <p className="text-gray-400 text-sm">{member.role}</p>
+                          <div className="flex items-center mt-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg 
+                                key={star} 
+                                className={`w-4 h-4 ${star <= Math.floor(member.rating) ? "text-yellow-400" : "text-gray-600"}`} 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                            <span className="ml-1 text-gray-400 text-xs">{member.rating}</span>
+                          </div>
+                        </div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              className="text-gray-400 hover:text-white" 
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="12" cy="5" r="1"></circle>
+                                <circle cx="12" cy="19" r="1"></circle>
+                              </svg>
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="bg-[#252836] border-gray-700 w-48 p-0">
+                            <div className="py-1">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditMember(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Edit Info
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateHours(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Edit Working Hours
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAssignServices(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Assign Services
+                              </button>
+                              <button 
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="cutters" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {staffMembers
+                  .filter(member => member.role.includes('Cutter'))
+                  .map((member) => (
+                    <div 
+                      key={member.id} 
+                      className="bg-[#252836] rounded-lg p-4 relative cursor-pointer hover:bg-[#2a2e3d] transition-colors"
+                      onClick={() => handleStaffClick(member)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="h-16 w-16 rounded-lg overflow-hidden">
+                          <img src={member.image} alt={member.name} className="h-full w-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-white font-medium">{member.name}</h3>
+                          <p className="text-gray-400 text-sm">{member.role}</p>
+                          <div className="flex items-center mt-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg 
+                                key={star} 
+                                className={`w-4 h-4 ${star <= Math.floor(member.rating) ? "text-yellow-400" : "text-gray-600"}`} 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                            <span className="ml-1 text-gray-400 text-xs">{member.rating}</span>
+                          </div>
+                        </div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button 
+                              className="text-gray-400 hover:text-white" 
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="12" cy="5" r="1"></circle>
+                                <circle cx="12" cy="19" r="1"></circle>
+                              </svg>
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="bg-[#252836] border-gray-700 w-48 p-0">
+                            <div className="py-1">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditMember(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Edit Info
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateHours(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Edit Working Hours
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAssignServices(member);
+                                }} 
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              >
+                                Assign Services
+                              </button>
+                              <button 
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {staffMembers.map((member) => (
-            <div key={member.id} className="bg-[#252836] rounded-lg p-4 relative">
-              <div className="flex items-start gap-4">
-                <div className="h-16 w-16 rounded-lg overflow-hidden">
-                  <img src={member.image} alt={member.name} className="h-full w-full object-cover" />
+      </div>
+      
+      {/* Staff Details Sheet */}
+      {selectedMember && (
+        <Sheet open={activeSheet === "details"} onOpenChange={() => setActiveSheet("")}>
+          <SheetContent className="bg-[#252836] text-white border-gray-700 w-full sm:max-w-md">
+            <SheetHeader>
+              <SheetTitle className="text-xl font-bold text-white">Staff Details</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-6 py-6">
+              <div className="flex items-center gap-4">
+                <div className="h-20 w-20 rounded-lg overflow-hidden">
+                  <img src={selectedMember.image} alt={selectedMember.name} className="h-full w-full object-cover" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-white font-medium">{member.name}</h3>
-                  <p className="text-gray-400 text-sm">{member.role}</p>
+                <div>
+                  <h3 className="text-white text-lg font-medium">{selectedMember.name}</h3>
+                  <p className="text-gray-400">{selectedMember.role}</p>
                   <div className="flex items-center mt-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <svg 
                         key={star} 
-                        className={`w-4 h-4 ${star <= Math.floor(member.rating) ? "text-yellow-400" : "text-gray-600"}`} 
+                        className={`w-4 h-4 ${star <= Math.floor(selectedMember.rating) ? "text-yellow-400" : "text-gray-600"}`} 
                         fill="currentColor" 
                         viewBox="0 0 20 20"
                       >
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ))}
-                    <span className="ml-1 text-gray-400 text-xs">{member.rating}</span>
+                    <span className="ml-1 text-gray-400 text-xs">{selectedMember.rating}</span>
                   </div>
                 </div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button className="text-gray-400 hover:text-white">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="1"></circle>
-                        <circle cx="12" cy="5" r="1"></circle>
-                        <circle cx="12" cy="19" r="1"></circle>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-gray-400 text-sm mb-2">Contact Information</h4>
+                  <div className="bg-[#1C1E27] p-4 rounded-md">
+                    <div className="flex items-center gap-3 mb-3">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                       </svg>
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="bg-[#252836] border-gray-700 w-48 p-0">
-                    <div className="py-1">
-                      <button 
-                        onClick={() => handleEditMember(member)} 
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                      >
-                        Edit Info
-                      </button>
-                      <button 
-                        onClick={() => handleUpdateHours(member)} 
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                      >
-                        Edit Working Hours
-                      </button>
-                      <button 
-                        onClick={() => handleAssignServices(member)} 
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                      >
-                        Assign Services
-                      </button>
-                      <button 
-                        className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
-                      >
-                        Delete
-                      </button>
+                      <span className="text-gray-300">+1 (555) 123-4567</span>
                     </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Add Member Modal */}
-      <Dialog open={memberModalOpen} onOpenChange={setMemberModalOpen}>
-        <DialogContent className="bg-[#252836] text-white border-gray-700 max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Add Member</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="flex justify-center mb-4">
-              <div className="relative w-24 h-24 rounded-md bg-gray-700 flex items-center justify-center">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="16"></line>
-                  <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
-                <Input className="bg-gray-700 border-gray-600 text-white" placeholder="Enter staff name" />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Role/Position</label>
-                <Input className="bg-gray-700 border-gray-600 text-white" placeholder="e.g. Hair Stylist" />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Phone Number</label>
-                <Input className="bg-gray-700 border-gray-600 text-white" placeholder="(000) 000-0000" />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
-                <Input className="bg-gray-700 border-gray-600 text-white" placeholder="email@example.com" />
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-2">Working Hours</h3>
-              
-              <div className="space-y-3">
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
-                  <div key={day} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">{day}</span>
-                    <div className="flex items-center gap-2">
-                      <Select defaultValue="09:00 AM">
-                        <SelectTrigger className="w-24 h-8 bg-gray-700 border-gray-600 text-white text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-700 border-gray-600 text-white">
-                          <SelectItem value="09:00 AM">09:00 AM</SelectItem>
-                          <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                          <SelectItem value="Off">Off</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <span className="text-xs text-gray-400">to</span>
-                      <Select defaultValue="05:00 PM">
-                        <SelectTrigger className="w-24 h-8 bg-gray-700 border-gray-600 text-white text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-700 border-gray-600 text-white">
-                          <SelectItem value="05:00 PM">05:00 PM</SelectItem>
-                          <SelectItem value="06:00 PM">06:00 PM</SelectItem>
-                          <SelectItem value="Off">Off</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="mt-5">
-            <Button className="w-full bg-blue-600 hover:bg-blue-700">Save</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Edit Member Modal */}
-      {selectedMember && (
-        <Dialog open={editMemberModalOpen} onOpenChange={setEditMemberModalOpen}>
-          <DialogContent className="bg-[#252836] text-white border-gray-700 max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">Edit Member</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-4">
-              <div className="flex justify-center mb-4">
-                <div className="relative w-24 h-24 rounded-md overflow-hidden">
-                  <img src={selectedMember.image} alt={selectedMember.name} className="w-full h-full object-cover" />
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
-                  <Input className="bg-gray-700 border-gray-600 text-white" defaultValue={selectedMember.name} />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Role/Position</label>
-                  <Input className="bg-gray-700 border-gray-600 text-white" defaultValue={selectedMember.role} />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Phone Number</label>
-                  <Input className="bg-gray-700 border-gray-600 text-white" placeholder="(000) 000-0000" />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
-                  <Input className="bg-gray-700 border-gray-600 text-white" placeholder="email@example.com" />
-                </div>
-              </div>
-            </div>
-            <div className="mt-5">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">Save</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-      
-      {/* Update Hours Modal */}
-      {selectedMember && (
-        <Dialog open={updateHoursModalOpen} onOpenChange={setUpdateHoursModalOpen}>
-          <DialogContent className="bg-[#252836] text-white border-gray-700 max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">Update Days/Hours for your Member</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-lg overflow-hidden">
-                  <img src={selectedMember.image} alt={selectedMember.name} className="h-full w-full object-cover" />
-                </div>
-                <div>
-                  <h3 className="text-white font-medium">{selectedMember.name}</h3>
-                  <p className="text-gray-400 text-sm">{selectedMember.role}</p>
-                </div>
-              </div>
-              
-              <div className="space-y-5">
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
-                  <div key={day} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-white">{day}</span>
-                      <Switch defaultChecked={day !== 'Sunday'} className="data-[state=checked]:bg-blue-600" />
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Select defaultValue="09:00 AM">
-                        <SelectTrigger className="w-24 h-8 bg-gray-700 border-gray-600 text-white text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-700 border-gray-600 text-white">
-                          <SelectItem value="09:00 AM">09:00 AM</SelectItem>
-                          <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <span className="text-xs text-gray-400">to</span>
-                      <Select defaultValue="05:00 PM">
-                        <SelectTrigger className="w-24 h-8 bg-gray-700 border-gray-600 text-white text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-700 border-gray-600 text-white">
-                          <SelectItem value="05:00 PM">05:00 PM</SelectItem>
-                          <SelectItem value="06:00 PM">06:00 PM</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                      </svg>
+                      <span className="text-gray-300">jessica.waltz@example.com</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="mt-5">
-              <Button className="bg-blue-600 hover:bg-blue-700">Save</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-      
-      {/* Assign Services Modal */}
-      {selectedMember && (
-        <Dialog open={assignServicesModalOpen} onOpenChange={setAssignServicesModalOpen}>
-          <DialogContent className="bg-[#252836] text-white border-gray-700 max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">Assign Services</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-lg overflow-hidden">
-                  <img src={selectedMember.image} alt={selectedMember.name} className="h-full w-full object-cover" />
                 </div>
+
                 <div>
-                  <h3 className="text-white font-medium">{selectedMember.name}</h3>
-                  <p className="text-gray-400 text-sm">{selectedMember.role}</p>
+                  <h4 className="text-gray-400 text-sm mb-2">Working Hours</h4>
+                  <div className="bg-[#1C1E27] p-4 rounded-md">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-gray-400 text-sm">Monday - Friday</p>
+                        <p className="text-gray-300">9:00 AM - 6:00 PM</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-sm">Saturday</p>
+                        <p className="text-gray-300">10:00 AM - 4:00 PM</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-sm">Sunday</p>
+                        <p className="text-gray-300">Closed</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-gray-400 text-sm mb-2">Assigned Services</h4>
+                  <div className="bg-[#1C1E27] p-4 rounded-md">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-300">Haircut</span>
+                        <span className="text-gray-400">$45</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-300">Hair Coloring</span>
+                        <span className="text-gray-400">$85</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-300">Hair Styling</span>
+                        <span className="text-gray-400">$35</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="space-y-4">
-                {['Face', 'Facial', 'Body', 'Hair', 'Massage', 'Nail Care', 'Makeup', 'Teeth Whitening'].map((service) => (
-                  <div key={service} className="flex items-center gap-3 p-3 border border-gray-700 rounded-md">
-                    <Checkbox id={`service-${service}`} className="data-[state=checked]:bg-blue-600 border-gray-600" />
-                    <label htmlFor={`service-${service}`} className="text-sm text-white font-medium">
-                      {service}
-                    </label>
-                  </div>
-                ))}
-              </div>
             </div>
-            <div className="mt-5">
-              <Button className="bg-blue-600 hover:bg-blue-700">Save</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+          </SheetContent>
+        </Sheet>
       )}
     </div>
   )

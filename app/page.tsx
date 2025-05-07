@@ -40,8 +40,25 @@ export default function Home() {
             <div className="flex flex-wrap gap-4 mt-10 animate-slideUp">
               <Link href="/login">
                 
-                <Image src="/get the app.png" alt="ChicChic Artist" width={400} height={100} />
-              </Link>
+              <div className="flex flex-row gap-4">
+      <div className="flex items-center justify-center rounded-full bg-black  border-white border-2 px-6 py-3">
+        <span className="text-white font-medium text-2xl">Get The App</span>
+        <div className="flex ml-5">
+         <Image src="/Frame 67.png" alt="ChicChic Artist" width={60} height={60} />
+        </div>
+      </div>
+
+      {/* Sign In Button */}
+      <Link href="/signin">
+        <div className="flex items-center justify-center rounded-full bg-transparent border border-gray-600 px-6 py-3">
+          <span className="text-white text-2xl font-medium">Sign In</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-2 text-white">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </div>
+      </Link>
+    </div>
+                </Link>
             </div>
           </div>
           

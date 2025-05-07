@@ -24,9 +24,9 @@ export default function DashboardSidebar() {
 
       <nav className="flex-1 p-4 space-y-1">
         <Link
-          href="/dashboard/schedules"
+          href="/dashboard/"
           className={`flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-800 transition-colors ${
-            pathname?.includes("/dashboard/schedules") 
+            pathname?.includes("/dashboard/") 
               ? "bg-gray-800 text-white" 
               : "text-gray-400 hover:text-white"
           }`}

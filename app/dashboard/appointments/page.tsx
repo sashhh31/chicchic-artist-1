@@ -125,39 +125,24 @@ export default function AppointmentsPage() {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
+              <Button variant="outline" className="bg-gray-800 border-gray-500  border rounded-full text-white hover:bg-gray-700">
                 All Appointments <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </div>
             <div className="flex items-center gap-3">
+             
               <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-                <Search className="h-5 w-5" />
+                <Filter className="h-7 w-7" />
               </Button>
               <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-                <Filter className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                <Bell className="h-7 w-7" />
+                <span className="absolute top-6 right-7 w-4 h-4 bg-red-500 rounded-full text-white text-xs">2</span>
               </Button>
             </div>
           </div>
 
           <Tabs defaultValue="all">
-            <TabsList className="bg-gray-800 border-gray-700 mb-6">
-              <TabsTrigger value="all" className="data-[state=active]:bg-gray-700">
-                All
-              </TabsTrigger>
-              <TabsTrigger value="booked" className="data-[state=active]:bg-gray-700">
-                Booked
-              </TabsTrigger>
-              <TabsTrigger value="completed" className="data-[state=active]:bg-gray-700">
-                Completed
-              </TabsTrigger>
-              <TabsTrigger value="cancelled" className="data-[state=active]:bg-gray-700">
-                Cancelled
-              </TabsTrigger>
-            </TabsList>
+           
 
             <TabsContent value="all" className="mt-0">
               <div className="bg-gray-800 rounded-lg overflow-hidden">
@@ -178,7 +163,7 @@ export default function AppointmentsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-600">
                           <Image
-                            src={appointment.client.avatar || "/placeholder.svg"}
+                            src= "/sarah.png"
                             alt={appointment.client.name}
                             width={32}
                             height={32}
@@ -276,7 +261,7 @@ export default function AppointmentsPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-600">
                             <Image
-                              src={appointment.client.avatar || "/placeholder.svg"}
+                              src= "/sarah.png"
                               alt={appointment.client.name}
                               width={32}
                               height={32}
@@ -349,7 +334,10 @@ export default function AppointmentsPage() {
       </main>
 
       {showDetails && selectedAppointment && (
+        <div className="z-50">
+
         <AppointmentDetails appointment={selectedAppointment} onClose={handleCloseDetails} />
+        </div>
       )}
     </div>
   )

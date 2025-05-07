@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
+import { Mail, Phone, X } from "lucide-react"
 
 type Appointment = {
   id: string
@@ -25,7 +25,7 @@ interface AppointmentDetailsProps {
 
 export default function AppointmentDetails({ appointment, onClose }: AppointmentDetailsProps) {
   return (
-    <div className="w-[320px] bg-gray-800 border-l border-gray-700 overflow-y-auto">
+    <div className="w-[520px] z-50  bg-gray-800 border-l border-gray-700 overflow-y-auto">
       <div className="p-4 border-b border-gray-700 flex items-center justify-between">
         <h2 className="font-medium">Appointment Details</h2>
         <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400 hover:text-white">
@@ -37,7 +37,7 @@ export default function AppointmentDetails({ appointment, onClose }: Appointment
         <div className="flex justify-center mb-4">
           <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-700">
             <Image
-              src={appointment.client.avatar || "/placeholder.svg"}
+              src="/sarah.png"
               alt={appointment.client.name}
               width={64}
               height={64}
@@ -47,33 +47,33 @@ export default function AppointmentDetails({ appointment, onClose }: Appointment
         </div>
 
         <h3 className="text-xl font-semibold text-center mb-1">{appointment.client.name}</h3>
-
-        <div className="flex justify-center gap-1 mb-6">
-          <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-xs font-medium">
-            FB
-          </div>
-          <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs font-medium">
-            TW
+        <h1 className="text-base text-gray-400 text-center m-5">@jeremy</h1>
+        <div className="flex justify-center gap-5 mb-6">
+        <div className="w-7 h-7 rounded-full p-1 bg-orange-500 flex items-center justify-center text-xs font-medium">
+            <Phone className="h-5 w-5"/>
+          </div>          
+          <div className="w-7 h-7 rounded-full p-1 bg-orange-500 flex items-center justify-center text-xs font-medium">
+            <Mail className="h-5 w-5"/>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div>
+        <div className="space-y-8">
+          <div className="flex justify-between">
             <h4 className="text-sm text-gray-400 mb-1">Service</h4>
             <p className="font-medium">Hair Curls</p>
           </div>
 
-          <div>
+          <div className="flex justify-between">
             <h4 className="text-sm text-gray-400 mb-1">Duration</h4>
             <p className="font-medium">1 hr 30 min</p>
           </div>
 
-          <div>
+          <div className="flex justify-between">
             <h4 className="text-sm text-gray-400 mb-1">Date</h4>
             <p className="font-medium">9th November, Tuesday</p>
           </div>
 
-          <div>
+          <div className="flex justify-between">
             <h4 className="text-sm text-gray-400 mb-1">Time</h4>
             <p className="font-medium">10:45 PM Onwards</p>
           </div>
@@ -96,7 +96,7 @@ export default function AppointmentDetails({ appointment, onClose }: Appointment
 
         <div className="mt-8 flex justify-center">
           <div className="w-32 h-32 bg-white p-2 rounded-md">
-            <Image src="/qr-code.png" alt="QR Code" width={128} height={128} className="w-full h-full" />
+            <Image src="/qr 1.png" alt="QR Code" width={128} height={128} className="w-full h-full" />
           </div>
         </div>
 
